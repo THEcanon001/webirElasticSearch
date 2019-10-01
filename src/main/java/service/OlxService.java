@@ -1,5 +1,10 @@
 package service;
 
+
+import entity.Vehicle;
+
+import java.util.ArrayList;
+
 public final class OlxService {
 
     private OlxService() {
@@ -7,6 +12,11 @@ public final class OlxService {
 
     public static void loadVehicles(){
         //todo JSOUP
-        //todo guardar en elasticsearch
+        ArrayList<Vehicle> vehicles = getVehicles();
+        ElasticSearchService.insert(vehicles);
+    }
+
+    private static ArrayList<Vehicle> getVehicles() {
+        return null;
     }
 }

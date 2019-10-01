@@ -18,13 +18,14 @@ public final class MercadoLibreService {
     private final static String getVehicleUrl = "https://api.mercadolibre.com/items";
     private final static int pages = 1;
 
+
     private MercadoLibreService(){
     }
 
     public static void loadVehiclesML() throws IOException, JSONException, UnirestException {
         ArrayList<String> ids = getIds(pages);
         ArrayList<Vehicle> vehicles = getVehicles(ids);
-        //todo: guardar en elasticsearch
+        ElasticSearchService.insert(vehicles);
     }
 
 

@@ -1,70 +1,72 @@
 package entity;
 
-public class Vehicle {
-        String Title;
-        int Price;
-        String Currency;
-        String Condition;
-        String Photos;
-        String Brand;
+import java.io.Serializable;
+
+public class Vehicle implements Serializable {
+    private String title;
+    private int price;
+    private String currency;
+    private String condition;
+    private String photos;
+    private String brand;
 
     public Vehicle() {
     }
 
     public Vehicle(String title, int price, String currency, String condition, String photos, String brand) {
-        Title = title;
-        Price = price;
-        Currency = currency;
-        Condition = condition;
-        Photos = photos;
-        Brand = brand;
+        this.title = title;
+        this.price = price;
+        this.currency = currency;
+        this.condition = condition;
+        this.photos = photos;
+        this.brand = brand;
     }
 
     public String getTitle() {
-        return Title;
+        return title;
     }
 
     public void setTitle(String title) {
-        Title = title;
+        this.title = title;
     }
 
     public int getPrice() {
-        return Price;
+        return price;
     }
 
     public void setPrice(int price) {
-        Price = price;
+        this.price = price;
     }
 
     public String getCurrency() {
-        return Currency;
+        return currency;
     }
 
     public void setCurrency(String currency) {
-        Currency = currency;
+        this.currency = currency;
     }
 
     public String getCondition() {
-        return Condition;
+        return condition;
     }
 
     public void setCondition(String condition) {
-        Condition = condition;
+        this.condition = condition;
     }
 
     public String getPhotos() {
-        return Photos;
+        return photos;
     }
 
     public void setPhotos(String photos) {
-        Photos = photos;
+        this.photos = photos;
     }
 
     public String getBrand() {
-        return Brand;
+        return brand;
     }
 
     public void setBrand(String brand) {
-        Brand = brand;
+        this.brand = brand;
     }
 }
