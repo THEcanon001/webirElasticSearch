@@ -10,8 +10,8 @@ public class main {
 
 
     public static void main(String[] args) throws IOException, JSONException, UnirestException {
-        ElasticSearchService.create();
-        //init();
+        ElasticSearchService.createClient();
+        init();
     }
 
 
