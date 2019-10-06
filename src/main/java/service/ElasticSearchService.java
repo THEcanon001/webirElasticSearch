@@ -4,12 +4,17 @@ package service;
 import com.google.gson.Gson;
 import entity.Vehicle;
 import org.apache.http.HttpHost;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.Version;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.main.MainResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -24,6 +29,9 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 public final class ElasticSearchService {
@@ -31,27 +39,41 @@ public final class ElasticSearchService {
     private final static RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
     private final static Logger LOGGER = Logger.getLogger("bitacora.subnivel.Control");
 
+    //The config parameters for the connection
+    private static final String HOST = "localhost";
+    private static final int PORT_ONE = 9200;
+    private static final int PORT_TWO = 9201;
+    private static final String SCHEME = "http";
+
+    private static RestHighLevelClient restHighLevelClient;
+    private static ObjectMapper objectMapper = new ObjectMapper();
+
+    private static final String INDEX = "persondata";
+    private static final String TYPE = "person";
+
     private ElasticSearchService(){
     }
 
     public static void insert(ArrayList<Vehicle> vehicles) throws IOException {
-        RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
-        LOGGER.info("Cliente conectado. ");
+        for (Vehicle v : vehicles){
+            Map<String, Object> dataMap = new HashMap<String, Object>();
+            String id = UUID.randomUUID().toString();
+            v.setId(id);
+            dataMap.put("id", id);
+            dataMap.put("title", v.getTitle());
+            dataMap.put("brand", v.getBrand());
+            dataMap.put("condition", v.getCondition());
+            dataMap.put("currency", v.getCurrency());
+            dataMap.put("price", Integer.toString(v.getPrice()));
+            dataMap.put("photos", v.getPhotos());
+            IndexRequest indexRequest = new IndexRequest(INDEX, TYPE, id)
+                    .source(dataMap);
+             restHighLevelClient.index(indexRequest);
+            //GetRequest getRequest = new GetRequest(INDEX, TYPE, id);
+            //GetResponse getResponse = null;
 
-        BulkRequest request = new BulkRequest();
-        int vehicleCount = 1;
-        for(Vehicle vehicle :vehicles) {
-            Gson gson = new Gson();
-            String JSON = gson.toJson(vehicle);
-            request.add(new IndexRequest("vehicles", "vehicle", String.valueOf(vehicleCount)).source(XContentType.JSON, JSON));
-            vehicleCount++;
+            //getResponse = restHighLevelClient.get(getRequest);
         }
-
-        BulkResponse bulkResponse = client.bulk(request, RequestOptions.DEFAULT);
-        LOGGER.info("Bulk con errores: {} "+ bulkResponse.hasFailures());
-
-        client.close();
-        LOGGER.info("Cliente desconectado.");
     }
 
     public static void update(){
@@ -78,41 +100,14 @@ public final class ElasticSearchService {
     }
 
 
-    public static void create() throws IOException {
-        RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
-        LOGGER.info("Cliente conectado. ");
+    public static void createClient() throws IOException {
 
-        CreateIndexRequest request = new CreateIndexRequest("vehicles");
-        String JSON = "{\n" +
-                "  \"properties\": {\n" +
-                "    \"title\": {\n" +
-                "      \"type\": \"text\"\n" +
-                "    },\n" +
-                "    \"price\": {\n" +
-                "      \"type\": \"number\"\n" +
-                "    },\n" +
-                "    \"currency\": {\n" +
-                "      \"type\": \"text\"\n" +
-                "    },\n" +
-                "    \"condition\": {\n" +
-                "      \"type\": \"text\"\n" +
-                "    },\n" +
-                "    \"photos\": {\n" +
-                "      \"type\": \"text\"\n" +
-                "    },\n" +
-                "    \"brand\": {\n" +
-                "      \"type\": \"text\"\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
-        request.mapping("vehicle", JSON, XContentType.JSON);
-        CreateIndexResponse createIndexResponse = client.indices().create(request, RequestOptions.DEFAULT);
-
-        boolean acknowledged = createIndexResponse.isAcknowledged();
-        LOGGER.info("Indice creado: {} " + acknowledged);
-
-        client.close();
-        LOGGER.info(" Cliente desconectado.");
+        if(restHighLevelClient == null) {
+            restHighLevelClient = new RestHighLevelClient(
+                    RestClient.builder(
+                            new HttpHost(HOST, PORT_ONE, SCHEME),
+                            new HttpHost(HOST, PORT_TWO, SCHEME)));
+        }
     }
 
     public static void test() throws IOException {

@@ -3,6 +3,7 @@ package entity;
 import java.io.Serializable;
 
 public class Vehicle implements Serializable {
+    private String id;
     private String title;
     private int price;
     private String currency;
@@ -68,5 +69,13 @@ public class Vehicle implements Serializable {
 
     public void setBrand(String brand) {
         this.brand = brand;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

@@ -13,7 +13,7 @@ public final class OlxService {
     public static void loadVehicles(){
         //todo JSOUP
         ArrayList<Vehicle> vehicles = getVehicles();
-        ElasticSearchService.insert(vehicles);
+        //ElasticSearchService.insert(vehicles);
     }
 
     private static ArrayList<Vehicle> getVehicles() {
