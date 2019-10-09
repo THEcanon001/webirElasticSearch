@@ -14,7 +14,6 @@ public class InicializadorSingleton {
 
     @PostConstruct
     private void postConstruct(){
-        //try {
         System.out.println(
                 "          __^__                                      __^__\n" +
                 "         ( ___ )------------------------------------( ___ )\n" +
@@ -22,10 +21,19 @@ public class InicializadorSingleton {
                 "          | / |          ESTO ES EL TUTANKA ;)       | / |\n" +
                 "          |___|                                      |___|\n" +
                 "         (_____)------------------------------------(_____) ");
+
         try{
-           tareasProgramadas.execute("init");
+            System.out.println("Se ejecuta carga inicial");
+            tareasProgramadas.init();
         } catch (Exception e){
-            System.out.println("Imposible ejecutar la tarea programada init " + e.getMessage());
+            System.out.println("Imposible ejecutar inicializacion de datos " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        try{
+            tareasProgramadas.execute("update");
+        } catch (Exception e){
+            System.out.println("Imposible ejecutar la tarea programada update " + e.getMessage());
             e.printStackTrace();
         }
     }

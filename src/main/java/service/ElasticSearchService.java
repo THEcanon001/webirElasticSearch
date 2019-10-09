@@ -1,20 +1,10 @@
 package service;
 
-
-import com.google.gson.Gson;
 import entity.Vehicle;
 import org.apache.http.HttpHost;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.Version;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.main.MainResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -22,7 +12,6 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.cluster.ClusterName;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -46,10 +35,9 @@ public final class ElasticSearchService {
     private static final String SCHEME = "http";
 
     private static RestHighLevelClient restHighLevelClient;
-    private static ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String INDEX = "persondata";
-    private static final String TYPE = "person";
+    private static final String INDEX = "vehicledata";
+    private static final String TYPE = "vehicle";
 
     private ElasticSearchService(){
     }
@@ -101,7 +89,6 @@ public final class ElasticSearchService {
 
 
     public static void createClient() throws IOException {
-
         if(restHighLevelClient == null) {
             restHighLevelClient = new RestHighLevelClient(
                     RestClient.builder(
@@ -110,7 +97,7 @@ public final class ElasticSearchService {
         }
     }
 
-    public static void test() throws IOException {
+    public static void info() throws IOException {
         MainResponse response = client.info(RequestOptions.DEFAULT);
         ClusterName clusterName = response.getClusterName();
         String clusterUuid = response.getClusterUuid();

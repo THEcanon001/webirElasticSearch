@@ -12,15 +12,17 @@ import java.io.IOException;
 @LocalBean
 @Stateless
 public class WebirEJBBean {
-    private boolean init;
+
     public void init() throws IOException, UnirestException {
-        if(!init) {
-            System.out.println("No cargue");
-            init = true;
-        } else
-            System.out.println("Cargue");
-//        ElasticSearchService.createClient();
-//        MercadoLibreService.loadVehiclesML();
-//        OlxService.loadVehicles();
+        System.out.println("CARGA INICIAL DE DATOS ;)");
+        try {
+            //ElasticSearchService.info();
+            //ElasticSearchService.createClient();
+            //MercadoLibreService.loadVehiclesML();
+            //OlxService.loadVehicles();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

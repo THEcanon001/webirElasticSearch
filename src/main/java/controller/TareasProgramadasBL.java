@@ -8,7 +8,7 @@ import javax.ejb.*;
 
 /**
  * Created with IntelliJ IDEA.
- * User: edu
+ * User: christian
  * Date: 26/12/12
  * Time: 02:35 PM
  */
@@ -22,7 +22,15 @@ public class TareasProgramadasBL {
     @EJB
     WebirEJBBean webirEJBBean;
 
-    private final static ProgramedTask tp = new ProgramedTask(0, "init", "*", "*", "*", "0,5,10,15,20,25,30,35,40,45,50,55");
+    private final static ProgramedTask tp = new ProgramedTask(0, "update", "1", "1", "1", "1");
+
+    public void init(){
+        try {
+            webirEJBBean.init();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     public void execute(String tarea) throws Exception {
         TimerConfig timerConfig = new TimerConfig();
@@ -32,7 +40,6 @@ public class TareasProgramadasBL {
         if (tp != null) {
             ScheduleExpression scheduleExpression = new ScheduleExpression();
             scheduleExpression.dayOfMonth(tp.getDia()).hour(tp.getHora()).minute(tp.getMinuto()).second(tp.getSegundo());
-
             Timer timer = this.timerService.createCalendarTimer(scheduleExpression, timerConfig);
         } else {
             throw new Exception("ERROR al configurar tarea programada " + tarea + ". No existe en la base de datos");
@@ -60,10 +67,9 @@ public class TareasProgramadasBL {
 
             //        timer.cancel();
             switch (splitTarea[0]) {
-                case "init":
+                case "update":
                     try {
-                        System.out.println("Se ejecuta tarea de inicializacion");
-                        webirEJBBean.init();
+                        System.out.println("Se ejecuta tarea de actualizacion");
                     } catch (Exception e) {
                         e.printStackTrace();
                         throw new Exception("Error al procesar la tarea.");

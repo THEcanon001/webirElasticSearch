@@ -14,10 +14,10 @@ import javax.ws.rs.core.MediaType;
 public class ApiService {
 
     @GET
-    @Path("status")
+    @Path("welcome")
     @Produces({MediaType.APPLICATION_JSON})
     public String status() {
-        return "ok";
+        return "Escuchando peticiones...";
     }
 
     @POST
