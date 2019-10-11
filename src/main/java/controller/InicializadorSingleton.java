@@ -10,7 +10,7 @@ import javax.ejb.Startup;
 public class InicializadorSingleton {
 
     @EJB
-    private TareasProgramadasBL tareasProgramadas;
+    private ProgramedTaskBL tareasProgramadas;
 
     @PostConstruct
     private void postConstruct(){
@@ -18,7 +18,7 @@ public class InicializadorSingleton {
                 "          __^__                                      __^__\n" +
                 "         ( ___ )------------------------------------( ___ )\n" +
                 "          | / |                                      | / |\n" +
-                "          | / |          ESTO ES EL TUTANKA ;)       | / |\n" +
+                "          | / |         VAMOS AL TUTANKA ;)          | / |\n" +
                 "          |___|                                      |___|\n" +
                 "         (_____)------------------------------------(_____) ");
 

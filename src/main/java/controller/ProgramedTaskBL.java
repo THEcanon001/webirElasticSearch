@@ -15,7 +15,7 @@ import javax.ejb.*;
 
 @LocalBean
 @Stateless
-public class TareasProgramadasBL {
+public class ProgramedTaskBL {
     @Resource
     private TimerService timerService;
 
