@@ -1,31 +1,27 @@
 package service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import entity.Vehicle;
 import org.apache.http.HttpHost;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.elasticsearch.Version;
+import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.main.MainResponse;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.*;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.cluster.ClusterName;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.client.core.MainResponse;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
+
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 
 public final class ElasticSearchService {
 
-    private final static RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
     private final static Logger LOGGER = Logger.getLogger("bitacora.subnivel.Control");
 
     //The config parameters for the connection
@@ -39,11 +35,15 @@ public final class ElasticSearchService {
     private static final String INDEX = "vehicledata";
     private static final String TYPE = "vehicle";
 
-    private ElasticSearchService(){
+    private static final Integer SIZE = 10000;
+
+    private static ObjectMapper objectMapper = new ObjectMapper();
+
+    private ElasticSearchService() {
     }
 
     public static void insert(ArrayList<Vehicle> vehicles) throws IOException {
-        for (Vehicle v : vehicles){
+        for (Vehicle v : vehicles) {
             Map<String, Object> dataMap = new HashMap<String, Object>();
             String id = UUID.randomUUID().toString();
             v.setId(id);
@@ -56,40 +56,52 @@ public final class ElasticSearchService {
             dataMap.put("photos", v.getPhotos());
             IndexRequest indexRequest = new IndexRequest(INDEX, TYPE, id)
                     .source(dataMap);
-             restHighLevelClient.index(indexRequest);
-            //GetRequest getRequest = new GetRequest(INDEX, TYPE, id);
-            //GetResponse getResponse = null;
-
-            //getResponse = restHighLevelClient.get(getRequest);
+            restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
         }
     }
 
-    public static void update(){
-        //TODO Actualizacion futura ;)
+    //TODO
+    public static List<Vehicle> getAllVehicles() {
+        return null;
     }
 
-    public static void select() throws IOException {
-        RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
-        LOGGER.info("Cliente conectado.");
-
-        SearchRequest searchRequest = new SearchRequest("vehicles");
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
-        searchRequest.source(searchSourceBuilder);
-
-        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-
-        for (SearchHit hit: searchResponse.getHits().getHits()){
-            LOGGER.info("Documento con id {}: {} "+ hit.getId() +" - " + hit.getSourceAsString());
+    public static List<Vehicle> getVehicles(String filter_type, String filter) {
+        List<Vehicle> vehicles = new ArrayList<>();
+        try {
+            SearchRequest searchRequest = new SearchRequest(INDEX);
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+            searchSourceBuilder.query(matchQuery(filter_type, filter));
+            searchSourceBuilder.size(SIZE);
+            searchRequest.source(searchSourceBuilder);
+            SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+            SearchHits hits = searchResponse.getHits();
+            SearchHit[] searchHits = hits.getHits();
+            for (SearchHit searchHit : searchHits) {
+                vehicles.add(searchHit != null ?
+                        objectMapper.convertValue(searchHit.getSourceAsMap(), Vehicle.class) : null);
+            }
         }
-
-        client.close();
-        LOGGER.info("Cliente desconectado.");
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return vehicles;
     }
 
+    //TODO
+    public static List<Vehicle> getVehicles(List<String> filter_type_list, List<String> filter_list) {
+        return null;
+    }
 
-    public static void createClient() throws IOException {
-        if(restHighLevelClient == null) {
+    public static boolean exist() throws IOException {
+        GetIndexRequest request = new GetIndexRequest().indices(INDEX);
+        request.local(false);
+        request.humanReadable(true);
+        request.includeDefaults(false);
+        return restHighLevelClient.indices().exists(request, RequestOptions.DEFAULT);
+    }
+
+    public static void createClient() {
+        if (restHighLevelClient == null) {
             restHighLevelClient = new RestHighLevelClient(
                     RestClient.builder(
                             new HttpHost(HOST, PORT_ONE, SCHEME),
@@ -97,18 +109,21 @@ public final class ElasticSearchService {
         }
     }
 
+    public static synchronized void closeConnection() throws IOException {
+        restHighLevelClient.close();
+        restHighLevelClient = null;
+    }
+
     public static void info() throws IOException {
-        MainResponse response = client.info(RequestOptions.DEFAULT);
-        ClusterName clusterName = response.getClusterName();
+        MainResponse response = restHighLevelClient.info(RequestOptions.DEFAULT);
+        String clusterName = response.getClusterName();
         String clusterUuid = response.getClusterUuid();
         String nodeName = response.getNodeName();
-        Version version = response.getVersion();
+        MainResponse.Version version = response.getVersion();
         LOGGER.info("Información del cluster: ");
-        LOGGER.info("Nombre del cluster: {} " + clusterName.value());
-        LOGGER.info("Identificador del cluster: {} "+  clusterUuid);
+        LOGGER.info("Nombre del cluster: {} " + clusterName);
+        LOGGER.info("Identificador del cluster: {} " + clusterUuid);
         LOGGER.info("Nombre de los nodos del cluster: {} " + nodeName);
-        LOGGER.info("Versión de elasticsearch del cluster: {} "+ version.toString());
-        client.close();
-        LOGGER.info("Cliente desconectado.");
+        LOGGER.info("Versión de elasticsearch del cluster: {} " + version.getBuildDate()+" "+version.getBuildFlavor()+" "+ version.getBuildType());
     }
 }

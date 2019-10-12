@@ -16,24 +16,24 @@ public final class MercadoLibreService {
 
     private final static String listUrl = "https://api.mercadolibre.com/sites/MLU/search";
     private final static String getVehicleUrl = "https://api.mercadolibre.com/items";
-    private final static int pages = 1;
+    private final static int pages = 20;
 
 
     private MercadoLibreService(){
     }
 
     public static void loadVehiclesML() throws IOException, JSONException, UnirestException {
-        ArrayList<String> ids = getIds(pages);
+        ArrayList<String> ids = getIds();
         ArrayList<Vehicle> vehicles = getVehicles(ids);
         ElasticSearchService.insert(vehicles);
     }
 
 
-    private static ArrayList<String> getIds(int pages) throws IOException, JSONException, UnirestException {
+    private static ArrayList<String> getIds() throws IOException, JSONException, UnirestException {
         ArrayList<String> ids = new ArrayList<String>();
-        for (int i = 0; i < pages; i++)
+        for (int i = 0; i < MercadoLibreService.pages; i++)
         {
-            HttpResponse<String> response = Unirest.get(listUrl + "?category=MLU1743&limit=50&offset=" + Integer.toString(50*pages))
+            HttpResponse<String> response = Unirest.get(listUrl + "?category=MLU1743&limit=50&offset=" + Integer.toString(50* MercadoLibreService.pages))
                     .header("cache-control", "no-cache")
                     .header("Postman-Token", "9fa1dd7a-f255-42b7-8a66-66f53db5087d")
                     .asString();
@@ -54,13 +54,13 @@ public final class MercadoLibreService {
         ArrayList<Vehicle> vehicles = new ArrayList<Vehicle>();
         for (int i = 0; i < ids.size(); i++)
         {
+            System.out.println("Vehicle "+i);
             HttpResponse<String> response = Unirest.get(getVehicleUrl + "?id=" + ids.get(i))
                     .header("Cache-Control", "no-cache")
                     .header("Postman-Token", "f23b7f9f-a231-48be-9e8f-f070519f48b1,0ec697a6-c146-4c9d-b72c-61bcbcc2a828")
                     .asString();
 
             JSONObject json = new JSONObject(response.getBody());
-            //JSONArray attributes = json.getJSONArray("attributes");
             JSONArray pictures = json.getJSONArray("pictures");
 
             Vehicle vehicle = new Vehicle();
