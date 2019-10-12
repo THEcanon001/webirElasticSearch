@@ -23,7 +23,6 @@ public class InicializadorSingleton {
                 "         (_____)------------------------------------(_____) ");
 
         try{
-            System.out.println("Se ejecuta carga inicial");
             tareasProgramadas.init();
         } catch (Exception e){
             System.out.println("Imposible ejecutar inicializacion de datos " + e.getMessage());

@@ -65,7 +65,6 @@ public class ProgramedTaskBL {
                 Timer timerTemp = this.timerService.createCalendarTimer(scheduleExpression, timerConfig);
             }
 
-            //        timer.cancel();
             switch (splitTarea[0]) {
                 case "update":
                     try {

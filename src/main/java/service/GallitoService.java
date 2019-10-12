@@ -5,9 +5,9 @@ import entity.Vehicle;
 
 import java.util.ArrayList;
 
-public final class OlxService {
+public final class GallitoService {
 
-    private OlxService() {
+    private GallitoService() {
     }
 
     public static void loadVehicles(){
