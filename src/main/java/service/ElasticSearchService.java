@@ -83,8 +83,13 @@ public final class ElasticSearchService {
             for (SearchHit searchHit : searchHits) {
                 Vehicle vehicle = searchHit != null ?
                         objectMapper.convertValue(searchHit.getSourceAsMap(), Vehicle.class) : null;
-                if(vehicle != null)
-                    vehicle.setBrand(filter.getValue());
+
+                if (vehicle != null) {
+                    if (filter.getType().equals("title"))
+                        vehicle.setBrand(filter.getValue());
+                    else
+                        vehicle.setBrand("No disp.");
+                }
                 vehicles.add(vehicle);
             }
         }

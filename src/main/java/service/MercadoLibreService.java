@@ -16,7 +16,7 @@ public final class MercadoLibreService {
 
     private final static String listUrl = "https://api.mercadolibre.com/sites/MLU/search";
     private final static String getVehicleUrl = "https://api.mercadolibre.com/items";
-    private final static int pages = 5;
+    private final static int pages = 20;
 
 
     private MercadoLibreService(){
