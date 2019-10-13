@@ -16,7 +16,7 @@ public final class MercadoLibreService {
 
     private final static String listUrl = "https://api.mercadolibre.com/sites/MLU/search";
     private final static String getVehicleUrl = "https://api.mercadolibre.com/items";
-    private final static int pages = 20;
+    private final static int pages = 5;
 
 
     private MercadoLibreService(){
@@ -33,7 +33,7 @@ public final class MercadoLibreService {
         ArrayList<String> ids = new ArrayList<String>();
         for (int i = 0; i < MercadoLibreService.pages; i++)
         {
-            HttpResponse<String> response = Unirest.get(listUrl + "?category=MLU1743&limit=50&offset=" + Integer.toString(50* MercadoLibreService.pages))
+            HttpResponse<String> response = Unirest.get(listUrl + "?category=MLU1743&limit=50&offset=" + Integer.toString(50 * i))
                     .header("cache-control", "no-cache")
                     .header("Postman-Token", "9fa1dd7a-f255-42b7-8a66-66f53db5087d")
                     .asString();

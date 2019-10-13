@@ -1,6 +1,7 @@
 package service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import entity.Filter;
 import entity.Vehicle;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
@@ -15,6 +16,9 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.convention.NameTokenizers;
@@ -37,7 +41,7 @@ public class ApiService {
     public Response load(@QueryParam("filter_type") String filter_Type, @QueryParam("filter") String filter) throws IOException {
         try{
             ElasticSearchService.createClient();
-            List<Vehicle> vehicleList = ElasticSearchService.getVehicles(filter_Type, filter);
+            List<Vehicle> vehicleList = ElasticSearchService.getVehicles(new Filter(filter_Type, filter));
             ElasticSearchService.closeConnection();
             ModelMapper modelMapper = new ModelMapper();
             modelMapper.getConfiguration().setSourceNameTokenizer(NameTokenizers.CAMEL_CASE)
@@ -61,29 +65,33 @@ public class ApiService {
         ElasticSearchService.createClient();
         List<Vehicle> vehicleList = ElasticSearchService.getAllVehicles();
         ElasticSearchService.closeConnection();
-        return null;
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setSourceNameTokenizer(NameTokenizers.CAMEL_CASE)
+                .setDestinationNameTokenizer(NameTokenizers.CAMEL_CASE);
+
+        Type targetListType = new TypeToken<List<Vehicle>>() {
+        }.getType();
+
+        List list = modelMapper.map(vehicleList, targetListType);
+        return Response.status(Response.Status.OK).entity(list).build();
     }
 
     @GET
     @Path("vehicles_filters")
     @Produces({MediaType.APPLICATION_JSON})
-    public Response load_many_filters(@QueryParam("filter_type_list") String filter_type, @QueryParam("filter_list") String filter) throws IOException {
+    public Response load_many_filters(@QueryParam("filters") String filters) throws IOException {
         try {
-            List<String> filter_type_list = new ArrayList<>();
-            List<String> filter_list = new ArrayList<>();
-            ObjectMapper mapper = new ObjectMapper();
-            byte[] filter_type_byte_array = DatatypeConverter.parseBase64Binary(filter_type);
-            String filter_type_type_json = new String(filter_type_byte_array);
-            byte[] filter_byte_array = DatatypeConverter.parseBase64Binary(filter_type);
-            String filter_type_json = new String(filter_byte_array);
-            try {
-                filter_type_list = mapper.readValue(filter_type_type_json, List.class);
-                filter_list = mapper.readValue(filter_type_json, List.class);
-            } catch (IOException e) {
-                e.printStackTrace();
+            JSONObject json = new JSONObject(filters);
+            JSONArray filtersArray = json.getJSONArray("filters");
+            ArrayList<Filter> filterList = new ArrayList<>();
+            for (int j = 0; j < filtersArray.length(); j++)
+            {
+                JSONObject filter = filtersArray.getJSONObject(j);
+                filterList.add(new Filter(filter.getString("type"), filter.getString("value")));
             }
+
             ElasticSearchService.createClient();
-            List<Vehicle> vehicleList = ElasticSearchService.getVehicles(filter_type_list, filter_list);
+            List<Vehicle> vehicleList = ElasticSearchService.getVehicles(filterList);
             ElasticSearchService.closeConnection();
             ModelMapper modelMapper = new ModelMapper();
             modelMapper.getConfiguration().setSourceNameTokenizer(NameTokenizers.CAMEL_CASE)
