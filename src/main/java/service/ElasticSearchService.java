@@ -77,8 +77,11 @@ public final class ElasticSearchService {
             SearchHits hits = searchResponse.getHits();
             SearchHit[] searchHits = hits.getHits();
             for (SearchHit searchHit : searchHits) {
-                vehicles.add(searchHit != null ?
-                        objectMapper.convertValue(searchHit.getSourceAsMap(), Vehicle.class) : null);
+                Vehicle vehicle = searchHit != null ?
+                        objectMapper.convertValue(searchHit.getSourceAsMap(), Vehicle.class) : null;
+                if(vehicle != null)
+                    vehicle.setBrand(filter);
+                vehicles.add(vehicle);
             }
         }
         catch (Exception e){
