@@ -1,6 +1,7 @@
 package service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import entity.Filter;
 import entity.Vehicle;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
@@ -10,6 +11,9 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.MainResponse;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -65,12 +69,12 @@ public final class ElasticSearchService {
         return null;
     }
 
-    public static List<Vehicle> getVehicles(String filter_type, String filter) {
+    public static List<Vehicle> getVehicles(Filter filter) {
         List<Vehicle> vehicles = new ArrayList<>();
         try {
             SearchRequest searchRequest = new SearchRequest(INDEX);
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-            searchSourceBuilder.query(matchQuery(filter_type, filter));
+            searchSourceBuilder.query(matchQuery(filter.getType(), filter.getValue()));
             searchSourceBuilder.size(SIZE);
             searchRequest.source(searchSourceBuilder);
             SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
@@ -80,7 +84,7 @@ public final class ElasticSearchService {
                 Vehicle vehicle = searchHit != null ?
                         objectMapper.convertValue(searchHit.getSourceAsMap(), Vehicle.class) : null;
                 if(vehicle != null)
-                    vehicle.setBrand(filter);
+                    vehicle.setBrand(filter.getValue());
                 vehicles.add(vehicle);
             }
         }
@@ -90,9 +94,36 @@ public final class ElasticSearchService {
         return vehicles;
     }
 
-    //TODO
-    public static List<Vehicle> getVehicles(List<String> filter_type_list, List<String> filter_list) {
-        return null;
+
+    public static List<Vehicle> getVehicles(ArrayList<Filter> filters) {
+        List<Vehicle> vehicles = new ArrayList<>();
+        try {
+            SearchRequest searchRequest = new SearchRequest(INDEX);
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+
+            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+            for (int i = 0 ; i < filters.size(); i++){
+                boolQuery = boolQuery.filter(QueryBuilders.termQuery(filters.get(i).getType(), filters.get(i).getValue()));
+            }
+
+            searchSourceBuilder.query(boolQuery);
+            searchSourceBuilder.size(SIZE);
+            searchRequest.source(searchSourceBuilder);
+            SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+            SearchHits hits = searchResponse.getHits();
+            SearchHit[] searchHits = hits.getHits();
+            for (SearchHit searchHit : searchHits) {
+                Vehicle vehicle = searchHit != null ?
+                        objectMapper.convertValue(searchHit.getSourceAsMap(), Vehicle.class) : null;
+                //if(vehicle != null)
+                //    vehicle.setBrand(filter.getValue());
+                vehicles.add(vehicle);
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return vehicles;
     }
 
     public static boolean exist() throws IOException {
