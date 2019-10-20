@@ -66,7 +66,26 @@ public final class ElasticSearchService {
 
     //TODO
     public static List<Vehicle> getAllVehicles() {
-        return null;
+
+        List<Vehicle> vehicles = new ArrayList<>();
+        try {
+            SearchRequest searchRequest = new SearchRequest(INDEX);
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+            searchSourceBuilder.query();
+            searchSourceBuilder.size(SIZE);
+            searchRequest.source(searchSourceBuilder);
+            SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+            SearchHits hits = searchResponse.getHits();
+            SearchHit[] searchHits = hits.getHits();
+            for (SearchHit searchHit : searchHits) {
+                Vehicle vehicle = searchHit != null ? objectMapper.convertValue(searchHit.getSourceAsMap(), Vehicle.class) : null;
+                vehicles.add(vehicle);
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return vehicles;
     }
 
     public static List<Vehicle> getVehicles(Filter filter) {
