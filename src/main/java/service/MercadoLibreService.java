@@ -16,7 +16,7 @@ public final class MercadoLibreService {
 
     private final static String listUrl = "https://api.mercadolibre.com/sites/MLU/search";
     private final static String getVehicleUrl = "https://api.mercadolibre.com/items";
-    private final static int pages = 20;
+    private final static int pages = 2;
 
 
     private MercadoLibreService(){
@@ -62,6 +62,7 @@ public final class MercadoLibreService {
 
             JSONObject json = new JSONObject(response.getBody());
             JSONArray pictures = json.getJSONArray("pictures");
+            JSONArray attributes = json.getJSONArray("attributes");
 
             Vehicle vehicle = new Vehicle();
             vehicle.setTitle(json.getString("title"));
@@ -75,6 +76,16 @@ public final class MercadoLibreService {
                 picturesString += pictures.getJSONObject(j).getString("url") + ",";
             }
             vehicle.setPhotos(picturesString.substring(0, picturesString.length() - 1));
+
+            for (int j = 0; j < attributes.length(); j++)
+            {
+                String id = attributes.getJSONObject(j).getString("id");
+                if (id.equals("BRAND")){
+                    vehicle.setBrand(attributes.getJSONObject(j).getString("value_name"));
+                    break;
+                }
+            }
+
             vehicles.add(vehicle);
         }
         return vehicles;
