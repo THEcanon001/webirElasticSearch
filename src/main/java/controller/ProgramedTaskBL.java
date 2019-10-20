@@ -22,28 +22,16 @@ public class ProgramedTaskBL {
     @EJB
     WebirEJBBean webirEJBBean;
 
-    private final static ProgramedTask tp = new ProgramedTask(0, "update", "1", "1", "1", "1");
-
-    public void init(){
-        try {
-            webirEJBBean.init();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
+    private final static ProgramedTask tp = new ProgramedTask(0, "init", "*", "*", "0,5,10,15,20,25,30,35,40,45,50,55", "*");
 
     public void execute(String tarea) throws Exception {
         TimerConfig timerConfig = new TimerConfig();
         timerConfig.setPersistent(false);
         timerConfig.setInfo(tarea);
 
-        if (tp != null) {
-            ScheduleExpression scheduleExpression = new ScheduleExpression();
-            scheduleExpression.dayOfMonth(tp.getDia()).hour(tp.getHora()).minute(tp.getMinuto()).second(tp.getSegundo());
-            Timer timer = this.timerService.createCalendarTimer(scheduleExpression, timerConfig);
-        } else {
-            throw new Exception("ERROR al configurar tarea programada " + tarea + ". No existe en la base de datos");
-        }
+        ScheduleExpression scheduleExpression = new ScheduleExpression();
+        scheduleExpression.dayOfMonth(tp.getDia()).hour(tp.getHora()).minute(tp.getMinuto()).second(tp.getSegundo());
+        Timer timer = this.timerService.createCalendarTimer(scheduleExpression, timerConfig);
     }
 
     @Timeout
@@ -65,17 +53,16 @@ public class ProgramedTaskBL {
                 Timer timerTemp = this.timerService.createCalendarTimer(scheduleExpression, timerConfig);
             }
 
-            switch (splitTarea[0]) {
-                case "update":
-                    try {
-                        System.out.println("Se ejecuta tarea de actualizacion");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        throw new Exception("Error al procesar la tarea.");
-                    }
-                    break;
-                default:
-                    timer.cancel();
+            if ("init".equals(splitTarea[0])) {
+                try {
+                    System.out.println("Se ejecuta tarea de inicializacion");
+                    webirEJBBean.init();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new Exception("Error al procesar la tarea.");
+                }
+            } else {
+                timer.cancel();
             }
         } catch (Exception ex) {
             ex.printStackTrace();

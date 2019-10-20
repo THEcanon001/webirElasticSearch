@@ -23,9 +23,14 @@ public class WebirEJBBean {
                 MercadoLibreService.loadVehiclesML();
                 GallitoService.loadVehicles();
                 LOGGER.info("Cargando vehiculos del gallito");
+            } else{
+                LOGGER.info("Actualizacion de vehículos en proceso...");
+                LOGGER.info("Actualizando vehiculos de mercadolibre");
+                //todo update
+                LOGGER.info("Actualizando vehiculos del gallito");
             }
             ElasticSearchService.closeConnection();
-            LOGGER.info("Carga inicial finalizada con exito");
+            LOGGER.info("Carga/actualizacion finalizada con exito");
         }
         catch (Exception e){
             e.printStackTrace();

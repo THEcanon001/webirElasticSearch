@@ -23,16 +23,9 @@ public class InicializadorSingleton {
                 "         (_____)------------------------------------(_____) ");
 
         try{
-            tareasProgramadas.init();
+            tareasProgramadas.execute("init");
         } catch (Exception e){
             System.out.println("Imposible ejecutar inicializacion de datos " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        try{
-            tareasProgramadas.execute("update");
-        } catch (Exception e){
-            System.out.println("Imposible ejecutar la tarea programada update " + e.getMessage());
             e.printStackTrace();
         }
     }
