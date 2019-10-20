@@ -15,9 +15,9 @@ public class WebirEJBBean {
 
     public void init() {
         try {
-            LOGGER.info("Carga inicial en proceso...");
             ElasticSearchService.createClient();
             ElasticSearchService.info();
+            LOGGER.info("Carga inicial en proceso...");
             if (!ElasticSearchService.exist()) {
                 LOGGER.info("Cargando vehiculos de mercadolibre");
                 MercadoLibreService.loadVehiclesML();
