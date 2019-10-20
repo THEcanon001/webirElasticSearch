@@ -1,7 +1,5 @@
 package controller;
 
-import entity.ProgramedTask;
-
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
@@ -25,7 +23,14 @@ public class InicializadorSingleton {
                 "         (_____)------------------------------------(_____) ");
 
         try{
-            tareasProgramadas.execute("init");
+            tareasProgramadas.init();
+        } catch (Exception e){
+            System.out.println("Imposible ejecutar inicializacion de datos " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        try{
+            tareasProgramadas.execute("update");
         } catch (Exception e){
             System.out.println("Imposible ejecutar inicializacion de datos " + e.getMessage());
             e.printStackTrace();

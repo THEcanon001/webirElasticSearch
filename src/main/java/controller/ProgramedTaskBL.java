@@ -21,16 +21,18 @@ public class ProgramedTaskBL {
 
     @EJB
     WebirEJBBean webirEJBBean;
-    private ProgramedTask tp = new ProgramedTask(0, "init", "*", "*", "2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58", "*");
+    private ProgramedTask tp = new ProgramedTask(0, "update", "1", "1", "1", "1");
+
+    public void init() {
+        webirEJBBean.init();
+    }
 
     public void execute(String tarea) throws Exception {
         TimerConfig timerConfig = new TimerConfig();
         timerConfig.setPersistent(false);
         timerConfig.setInfo(tarea);
-
         ScheduleExpression scheduleExpression = new ScheduleExpression();
         scheduleExpression.dayOfMonth(tp.getDia()).hour(tp.getHora()).minute(tp.getMinuto()).second(tp.getSegundo());
-        tp = new ProgramedTask(0, "init", "*", "1", "1", "1");
         Timer timer = this.timerService.createCalendarTimer(scheduleExpression, timerConfig);
     }
 
@@ -53,10 +55,10 @@ public class ProgramedTaskBL {
                 Timer timerTemp = this.timerService.createCalendarTimer(scheduleExpression, timerConfig);
             }
 
-            if ("init".equals(splitTarea[0])) {
+            if ("update".equals(splitTarea[0])) {
                 try {
-                    System.out.println("Se ejecuta tarea de inicializacion");
-                    webirEJBBean.init();
+                    System.out.println("Se ejecuta tarea de actualizacion");
+                    webirEJBBean.update();
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new Exception("Error al procesar la tarea.");

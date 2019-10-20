@@ -15,25 +15,24 @@ public class WebirEJBBean {
 
     public void init() {
         try {
+            LOGGER.info("Carga inicial en proceso...");
             ElasticSearchService.createClient();
             ElasticSearchService.info();
             if (!ElasticSearchService.exist()) {
-                LOGGER.info("Carga inicial en proceso...");
                 LOGGER.info("Cargando vehiculos de mercadolibre");
                 MercadoLibreService.loadVehiclesML();
                 GallitoService.loadVehicles();
                 LOGGER.info("Cargando vehiculos del gallito");
-            } else{
-                LOGGER.info("Actualizacion de vehículos en proceso...");
-                LOGGER.info("Actualizando vehiculos de mercadolibre");
-                //todo update
-                LOGGER.info("Actualizando vehiculos del gallito");
             }
             ElasticSearchService.closeConnection();
-            LOGGER.info("Carga/actualizacion finalizada con exito");
+            LOGGER.info("Carga inicial finalizada con exito");
+
         }
         catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void update() {
     }
 }
