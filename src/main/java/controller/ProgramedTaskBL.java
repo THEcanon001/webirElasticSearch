@@ -21,8 +21,7 @@ public class ProgramedTaskBL {
 
     @EJB
     WebirEJBBean webirEJBBean;
-
-    private final static ProgramedTask tp = new ProgramedTask(0, "init", "*", "*", "0,5,10,15,20,25,30,35,40,45,50,55", "*");
+    private ProgramedTask tp;
 
     public void execute(String tarea) throws Exception {
         TimerConfig timerConfig = new TimerConfig();
@@ -68,5 +67,13 @@ public class ProgramedTaskBL {
             ex.printStackTrace();
             throw new Exception(ex.getMessage(), ex);
         }
+    }
+
+    public ProgramedTask getTp() {
+        return tp;
+    }
+
+    public void setTp(ProgramedTask tp) {
+        this.tp = tp;
     }
 }
