@@ -5,10 +5,7 @@ import entity.Filter;
 import entity.Vehicle;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.DatatypeConverter;
@@ -74,6 +71,14 @@ public class ApiService {
 
         List list = modelMapper.map(vehicleList, targetListType);
         return Response.status(Response.Status.OK).entity(list).build();
+    }
+
+    @POST
+    @Path("sendToken")
+    //@Consumes("application/json")
+    public void sendToken(String token) throws IOException {
+        int a = 1;
+        a = a + 1;
     }
 
     @GET
