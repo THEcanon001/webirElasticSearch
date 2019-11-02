@@ -148,7 +148,6 @@ public final class GallitoService {
                     String[] parts = s.split(" | ");
                     String part1 = parts[0];
                     String part2 = parts[3];
-                    String part3 = parts[1];
                     Vehicle ve = ret.get(i);
                     String kilom = part1.replace(".", "");
                     int km = Integer.parseInt(kilom);
