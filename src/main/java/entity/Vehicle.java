@@ -10,17 +10,21 @@ public class Vehicle implements Serializable {
     private String condition;
     private String photos;
     private String brand;
+    private int kms;
+    private int year;
 
     public Vehicle() {
     }
 
-    public Vehicle(String title, int price, String currency, String condition, String photos, String brand) {
+    public Vehicle(String title, int price, String currency, String condition, String photos, String brand, int kms, int year) {
         this.title = title;
         this.price = price;
         this.currency = currency;
         this.condition = condition;
         this.photos = photos;
         this.brand = brand;
+        this.kms = kms;
+        this.year = year;
     }
 
     public String getTitle() {
@@ -78,4 +82,18 @@ public class Vehicle implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
+
+    public int getKms() { return kms; }
+
+    public void setKms(int kms) {
+        this.kms = kms;
+    }
+
+    public int getYear() { return year; }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+
 }
